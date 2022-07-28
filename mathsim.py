@@ -40,7 +40,7 @@ class SlotMachine:
         self.reels_sheetname = 'Reels'
         self.paytable_sheetname = 'Paytable'
         self.paylines_sheetname = 'Paylines'
-        self.rtp_sheetname = 'Ways_Pays'   # it doesn't like 'Ways/Pays' in excel
+        self.rtp_sheetname = 'RTP'   # it doesn't like 'Ways/Pays' in excel
         ## examples, uncomment to override the original sheet values
         # 3 reel low volatility
         #self.reels_sheetname = 'Reels_lowvol'
@@ -51,9 +51,10 @@ class SlotMachine:
         #self.paytable_sheetname = 'Paytable_highvol'
         #self.paylines_sheetname = 'Paylines'      
         # 5 reels, Marissa's original setup 
-        #self.reels_sheetname = 'Reels5'
-        #self.paytable_sheetname = 'Paytable5'
-        #self.paylines_sheetname = 'Paylines25'        
+        self.reels_sheetname = 'Reels5'
+        self.paytable_sheetname = 'Paytable5'
+        self.paylines_sheetname = 'Paylines25'        
+        self.rtp_sheetname = 'RTP5'   # it doesn't like 'Ways/Pays' in excel
         # ad hoc, a 5 reel with *M and *F 3/4/5x paytable lines added;
         #self.reels_sheetname = 'Reels5'
         #self.paytable_sheetname = 'Paytable5_withwilds'
@@ -396,7 +397,7 @@ class SlotMachine:
 
         # set the RTP
         self.rtp_data = pd.read_excel(self.input_filepath, sheet_name=self.rtp_sheetname)
-        self.rtp = self.rtp_data['Game RTP'][0] * 100 ## times 100 so that we have the percentage that matches the data
+        self.rtp = self.rtp_data['RTP'][0] * 100 ## times 100 so that we have the percentage that matches the data
 
         # Paytable Math begins here. 
         #total_combinations = 0
