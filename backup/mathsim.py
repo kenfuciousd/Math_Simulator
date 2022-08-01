@@ -591,8 +591,6 @@ class SlotMachine:
         self.build_game_window()
         self.is_a_win()
 
-
-
 class Simulator():
     """ simulator class: takes in the SlotMachine class object, does stuff and tracks it. """
     def __init__(self, sm, simnum, debug_level):
