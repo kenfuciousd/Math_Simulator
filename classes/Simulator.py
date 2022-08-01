@@ -82,6 +82,7 @@ class Simulator():
         for i in range(0, len(self.spins)):
             rtp.append(self.sm.rtp)
         plt.plot(self.spins, rtp, linestyle = 'dashed', color='magenta')
+        plt.text(self.spins[len(self.spins)-1] - 160, self.sm.rtp + 5, "Expected RTP " + str(rtp[0]) + "%", color='magenta')
         plt.show()       
 
     # this should be used, in some form.. I don't like addressing this directly. However 

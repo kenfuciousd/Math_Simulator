@@ -16,7 +16,7 @@ class tkGui(tk.Tk):
         super().__init__()  #the super is a bit unnecessary, as there is nothing to inherit... but leaving it here for reference. 
         self.debug_level_default = 1
         #initial gui settings and layout
-        self.geometry("560x700")
+        self.geometry("560x650")
         self.title("Slot Simulator")
         self.columnconfigure(0, weight = 1)
         self.columnconfigure(1, weight = 1)
@@ -49,6 +49,7 @@ class tkGui(tk.Tk):
         self.return_to_player = DoubleVar(self, value = 0)
         self.found_volatility = DoubleVar(self, value = 0)
         self.found_return_to_player = DoubleVar(self, value = 0)
+        self.plot_toggle = 0
         # finally for init, create the gui itself, calling the function
         self.create_gui()
 
@@ -122,6 +123,9 @@ class tkGui(tk.Tk):
         self.payline_number.set(len(self.sm.paylines))
         self.payline_totalbet.set("{:.2f}".format(int(self.payline_number.get()) * float(self.bet_entry.get())))
         # a gui checkbox to show it was done? in the build column in slot 0?
+
+    def refill_button_clicked(self):
+        self.sm.adjust_credits(self.initial_credits.get())
 
     #### This is where the magic happens in the GUI, part 2 ####
     def sim_button_clicked(self):
@@ -251,6 +255,8 @@ class tkGui(tk.Tk):
         gui_row_iteration += 1
         self.run_sim_button = tk.Button(self, text="3. Run Simulation", command = self.sim_button_clicked)       
         self.run_sim_button.grid(row = gui_row_iteration, column = 0, sticky=W, padx=15)
+        self.run_refill_button = tk.Button(self, text="Refill Slot with Initial Credits", command = self.refill_button_clicked)       
+        self.run_refill_button.grid(row = gui_row_iteration, column = 1, sticky=W, padx=15)
         gui_row_iteration += 1
 
         #sim label
