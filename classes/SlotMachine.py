@@ -24,7 +24,7 @@ class SlotMachine():
         self.rtp_sheetname = 'RTP'   # it doesn't like 'Ways/Pays' in excel
         self.vi_sheetname = 'RTP'
         self.rtp_column = 'RTP'
-        self.vi_column = 'VI'
+        self.vi_column = 'Volatility'
         ## examples, uncomment to override the original sheet values
         # 3 reel low volatility
         #self.reels_sheetname = 'Reels_lowvol'

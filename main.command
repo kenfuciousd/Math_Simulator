@@ -1,6 +1,6 @@
 #!/opt/homebrew/bin/python3
 
-# main.py
+# main.command
 #  This is the main file for a slot machine simulator, allowing an excel file with configurations to be read
 #  into the slot machine, and generate randomly simulated results over a chosen number of spins
 

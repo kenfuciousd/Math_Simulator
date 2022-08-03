@@ -31,6 +31,7 @@ class tkGui(tk.Tk):
         self.mechreel_checked = BooleanVar(self, value=True)
         # .. simulator settings: 
         self.initial_credits = IntVar(self, value = 100)
+        self.machine_credits = IntVar(self, value = 0)
         self.simruns = IntVar(self, value = 500)
         self.input_filepath = StringVar(self, value = "./assets/PARishSheets.xlsx") 
         self.sim_output_filepath = StringVar(self, value = "./assets/simdata.csv")
@@ -111,7 +112,12 @@ class tkGui(tk.Tk):
     # a quick and dirty reset button
     def refill_button_clicked(self):
         self.status_box.set(f"[3a. Slot Credits Refilled, ready to rerun Simulation]")
-        self.sm.adjust_credits(self.initial_credits.get())
+        #reset defaults, from Slot Machine initialization
+        self.sm.game_credits = 0
+        self.sm.incremental_rtp = []
+        self.sm.incremental_credits = []
+        self.sm.adjust_credits(int(self.sm.initial_credits))
+        self.machine_credits.set(self.sm.return_credits())
 
     #### This is where the magic happens in the GUI, part 1 ####
     def build_slot_button(self):
@@ -127,6 +133,7 @@ class tkGui(tk.Tk):
         self.status_box.set("[2. Slot Built - Credits Loaded]")
         self.payline_number.set(len(self.sm.paylines))
         self.payline_totalbet.set("{:.2f}".format(int(self.payline_number.get()) * float(self.bet_entry.get())))
+        self.machine_credits.set(self.sm.return_credits())
         # a gui checkbox to show it was done? in the build column in slot 0?
 
     #### This is where the magic happens in the GUI, part 2 ####
@@ -136,7 +143,7 @@ class tkGui(tk.Tk):
         if(self.slot_ready == True):
             self.status_box.set("[3. Done - Click 2 to Rebuild Slot, or Reload Credits]")                  # set the status first, to also show behavior. 
             self.sim = Simulator(self.sm, self.simruns.get(), self.debug_level.get())   # simulator call 
-            self.df = pd.DataFrame(self.sim.df_dict)                                    # pull the saved simulator dat
+            self.df = pd.DataFrame(self.sim.win_dict)                                    # pull the saved simulator dat
            
             #print(f" So here is what is returned from the SIM: \n {str(self.df)}")
             ######math goes here for output
@@ -163,6 +170,8 @@ class tkGui(tk.Tk):
             # finally, record / print our final values as a status
             if(self.debug_level.get() >= 0):
                 print(f"Final values, at spin {self.sim.spins[len(self.sim.spins)-1]}, the final credit value was {self.sim.incremental_credits[len(self.sim.incremental_credits)-1]}" )
+            # set the machine credits after each run
+            self.machine_credits.set(self.sm.return_credits())
             print("Simulation Complete")
         else:
             self.status_box.set("[->2. Click 2 to Build or reload]")
@@ -215,8 +224,12 @@ class tkGui(tk.Tk):
         #self.mechreel_checkbox = ttk.Checkbutton(self, variable = self.mechreel_checked, onvalue = True, offvalue = False)
         #self.mechreel_checkbox.grid(row = gui_row_iteration, column = 2)        
         #gui_row_iteration += 1
+        self.label_machine_credits = tk.Label(self, text="Machine Credits: ")
+        self.label_machine_credits.grid(row = gui_row_iteration, column = 0, sticky=E)
+        self.machine_credit_entry = ttk.Entry(self, width = 8, state='readonly', textvariable = self.machine_credits)
+        self.machine_credit_entry.grid(row = gui_row_iteration, column = 1)
         self.label_infinite = tk.Label(self, text="Infinite Credits: ")
-        self.label_infinite.grid(row = gui_row_iteration, column = 0, columnspan=3, sticky=E)
+        self.label_infinite.grid(row = gui_row_iteration, column = 2, sticky=E)
         self.infinite_checkbox = ttk.Checkbutton(self, variable = self.infinite_checked, onvalue = True, offvalue = False)
         self.infinite_checkbox.grid(row = gui_row_iteration, column = 3)        
         gui_row_iteration += 1
@@ -229,7 +242,7 @@ class tkGui(tk.Tk):
         self.run_slots_button.grid(row = gui_row_iteration, column = 0, sticky=W, padx=15)
         gui_row_iteration += 1
 
-        # the status box. intentionally making it a bit obnoxious to catch the eye and because I want to change how this works later. 
+        # the status box. intentionally making it a bit obnoxious to catch the eye and because I may want to change how this works later. 
         self.status_box_box = tk.Label(self, textvariable=self.status_box, bg = "dodgerblue1", fg = "ghostwhite")
         self.status_box_box.grid(row = gui_row_iteration, columnspan=4, pady=15 )
         gui_row_iteration += 1
@@ -259,8 +272,8 @@ class tkGui(tk.Tk):
         gui_row_iteration += 1
         self.run_sim_button = tk.Button(self, text="3. Run Simulation", command = self.sim_button_clicked)       
         self.run_sim_button.grid(row = gui_row_iteration, column = 0, sticky=W, padx=15)
-        self.run_refill_button = tk.Button(self, text="Reload Slot with Initial Credits", command = self.refill_button_clicked)       
-        self.run_refill_button.grid(row = gui_row_iteration, column = 1, sticky=W, padx=15)
+        #self.run_refill_button = tk.Button(self, text="Reload Slot with Initial Credits", command = self.refill_button_clicked)       
+        #self.run_refill_button.grid(row = gui_row_iteration, column = 1, columnspan = 3, sticky=W, padx=15)
         gui_row_iteration += 1
 
         #sim label
