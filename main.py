@@ -1,4 +1,8 @@
+#!/usr/bin/env python
+
 # main.py
+#  This is the main file for a slot machine simulator, allowing an excel file with configurations to be read
+#  into the slot machine, and generate randomly simulated results over a chosen number of spins
 
 from classes.tkGui import *
 

@@ -14,9 +14,9 @@ class tkGui(tk.Tk):
 
     def __init__(self):
         super().__init__()  #the super is a bit unnecessary, as there is nothing to inherit... but leaving it here for reference. 
-        self.debug_level_default = 1
+        self.debug_level_default = 0
         #initial gui settings and layout
-        self.geometry("560x650")
+        self.geometry("650x650")
         self.title("Slot Simulator")
         self.columnconfigure(0, weight = 1)
         self.columnconfigure(1, weight = 1)
@@ -108,6 +108,11 @@ class tkGui(tk.Tk):
         if(self.debug_level.get() >= 1):
             print(f"    Math Output File Saving... {str(self.math_output_filepath.get())}")
 
+    # a quick and dirty reset button
+    def refill_button_clicked(self):
+        self.status_box.set(f"[3a. Slot Credits Refilled, ready to rerun Simulation]")
+        self.sm.adjust_credits(self.initial_credits.get())
+
     #### This is where the magic happens in the GUI, part 1 ####
     def build_slot_button(self):
         # use the current values
@@ -124,15 +129,12 @@ class tkGui(tk.Tk):
         self.payline_totalbet.set("{:.2f}".format(int(self.payline_number.get()) * float(self.bet_entry.get())))
         # a gui checkbox to show it was done? in the build column in slot 0?
 
-    def refill_button_clicked(self):
-        self.sm.adjust_credits(self.initial_credits.get())
-
     #### This is where the magic happens in the GUI, part 2 ####
     def sim_button_clicked(self):
         #start simulation here...
         #print("buttonpress")
         if(self.slot_ready == True):
-            self.status_box.set("[3. Done - Click 2 to Rebuild Slot]")                  # set the status first, to also show behavior. 
+            self.status_box.set("[3. Done - Click 2 to Rebuild Slot, or Reload Credits]")                  # set the status first, to also show behavior. 
             self.sim = Simulator(self.sm, self.simruns.get(), self.debug_level.get())   # simulator call 
             self.df = pd.DataFrame(self.sim.df_dict)                                    # pull the saved simulator dat
            
@@ -143,20 +145,20 @@ class tkGui(tk.Tk):
             hfe = ( self.sm.hit_total / self.simruns.get() )  * 100   #### is this needed? it's used in the templates file... 
             self.hit_freq.set(str(round(hfe, 2))+"%")
             ml = self.sm.maximum_liability
-            self.max_liability.set("$"+str(ml))
+            self.max_liability.set("$"+str(round(ml, 2)))
             
             #### volatility goes here. ### 
             if(self.debug_level.get() >= 1):
                 print(f"    ^^^^ the volatility math: {self.sm.summation} / {self.simruns.get() * (len(self.sm.paytable) + 1)} = {self.sm.summation/(self.simruns.get() * (len(self.sm.paytable) + 1))}.. sqrt is {math.sqrt( self.sm.summation / (self.simruns.get() * (len(self.sm.paytable) + 1) ))}, and so with * 1.96 the volatility index is {math.sqrt( self.sm.summation / (self.simruns.get() * (len(self.sm.paytable) + 1) )) * 1.96} ")
             volatilitymath = math.sqrt( self.sm.summation / (self.simruns.get() * (len(self.sm.paytable) + 1) ) ) * 1.96
             self.volatility.set(round(volatilitymath, 2))
-            self.found_volatility.set(self.sm.vi)
+            self.found_volatility.set(round(self.sm.vi, 2))
 
             # RTP
             if(self.debug_level.get() >= 1):
                 print(f"    $$$$ RTP is {self.sm.total_won} / {self.sm.total_bet} = {(self.sm.total_won / self.sm.total_bet)} ")
             self.return_to_player.set("{:.2f}".format(self.sm.total_won / self.sm.total_bet * 100)+"%")
-            self.found_return_to_player.set(self.sm.rtp) 
+            self.found_return_to_player.set(round(self.sm.rtp, 2)) 
 
             # finally, record / print our final values as a status
             if(self.debug_level.get() >= 0):
@@ -165,6 +167,8 @@ class tkGui(tk.Tk):
         else:
             self.status_box.set("[->2. Click 2 to Build or reload]")
             #print("->1. Slot needs to be loaded first.")
+        # this is how to keep the #'s from running out of control between spins'
+        self.sm.hit_total = 0
 
     def plot_cred_button_clicked(self):
         self.sim.plot_credits_result()
@@ -176,11 +180,11 @@ class tkGui(tk.Tk):
         # UI element values
         gui_row_iteration = 0
         #self.input_filepath = StringVar(self, value = '/Users/jdyer/Documents/GitHub/JD-Programming-examples/Python/math_slot_simulator/PARishSheets.xlsx')
-        self.label_plot = tk.Label(self, text="1. Select Input File")
+        self.label_plot = tk.Label(self, text="1. Select Input File ")
         self.label_plot.grid(row = gui_row_iteration, column = 0, columnspan = 3, sticky=W, padx=15)
         gui_row_iteration += 1
         self.input_label_filepath = tk.Label(self, text="Input Filepath ")
-        self.input_label_filepath.grid(row = gui_row_iteration, column = 0)
+        self.input_label_filepath.grid(row = gui_row_iteration, column = 0, sticky=E)
         #self.label_filepath.pack( side = LEFT)
         self.input_file_entry = ttk.Entry(self, textvariable = self.input_filepath, text=self.input_filepath)
         #self.input_file_entry.insert(0,self.input_filepath)
@@ -196,12 +200,12 @@ class tkGui(tk.Tk):
         self.debug_entry = ttk.Entry(self, width = 8, textvariable = self.debug_level)
         self.debug_entry.grid(row = gui_row_iteration, column = 3)
         gui_row_iteration += 1
-        self.label_bet = tk.Label(self, text="Bet per Line")
+        self.label_bet = tk.Label(self, text="Bet per Line ")
         self.label_bet.grid(row = gui_row_iteration, column = 0, sticky=E)
         self.bet_entry = ttk.Entry(self, width = 8, textvariable = self.bet)
         self.bet_entry.grid(row = gui_row_iteration, column = 1)
         #gui_row_iteration += 1
-        self.label_cred = tk.Label(self, text="Starting Dollars ")
+        self.label_cred = tk.Label(self, width = 14, text="Starting Dollars ")
         self.label_cred.grid(row = gui_row_iteration, column = 2, sticky=E)
         self.credit_entry = ttk.Entry(self, width = 8, textvariable = self.initial_credits)
         self.credit_entry.grid(row = gui_row_iteration, column = 3)
@@ -231,7 +235,7 @@ class tkGui(tk.Tk):
         gui_row_iteration += 1
 
         # payline explanation
-        self.label_payinfo = tk.Label(self, text="Paylines")
+        self.label_payinfo = tk.Label(self, text="Paylines: ")
         self.label_payinfo.grid(row = gui_row_iteration, column = 0, sticky=E)
         self.paylines_entry = ttk.Entry(self, width = 8, state='readonly', textvariable = self.payline_number)
         self.paylines_entry.grid(row = gui_row_iteration, column = 1)
@@ -243,19 +247,19 @@ class tkGui(tk.Tk):
         gui_row_iteration += 1
 
         # simulator info
-        self.label_simruns = tk.Label(self, text="Simulator Total Spins" )
+        self.label_simruns = tk.Label(self, text="Simulator Total Spins " )
         self.label_simruns .grid(row = gui_row_iteration, column = 0, columnspan=3, sticky=E)
-        self.simrun_entry = ttk.Entry(self, width = 10, textvariable = self.simruns)
+        self.simrun_entry = ttk.Entry(self, width = 8, textvariable = self.simruns)
         self.simrun_entry.grid(row = gui_row_iteration, column = 3, pady=5)
         gui_row_iteration += 1
 
         # Run Button
-        self.label_sim = tk.Label(self, text="3. Run Simulation")
+        self.label_sim = tk.Label(self, text="3. Run Simulation ")
         self.label_sim.grid(row = gui_row_iteration, column = 0, columnspan = 3, sticky=W, padx=15)
         gui_row_iteration += 1
         self.run_sim_button = tk.Button(self, text="3. Run Simulation", command = self.sim_button_clicked)       
         self.run_sim_button.grid(row = gui_row_iteration, column = 0, sticky=W, padx=15)
-        self.run_refill_button = tk.Button(self, text="Refill Slot with Initial Credits", command = self.refill_button_clicked)       
+        self.run_refill_button = tk.Button(self, text="Reload Slot with Initial Credits", command = self.refill_button_clicked)       
         self.run_refill_button.grid(row = gui_row_iteration, column = 1, sticky=W, padx=15)
         gui_row_iteration += 1
 
@@ -265,7 +269,7 @@ class tkGui(tk.Tk):
         gui_row_iteration += 1
         #Sim output file
         self.sim_output_label_filepath = tk.Label(self, text="Sim Output Filepath ")
-        self.sim_output_label_filepath.grid(row = gui_row_iteration, column = 0)
+        self.sim_output_label_filepath.grid(row = gui_row_iteration, column = 0, sticky=E)
         self.sim_output_file_entry = ttk.Entry(self, textvariable = self.sim_output_filepath, text=self.sim_output_filepath)
         self.sim_output_file_entry.grid(row = gui_row_iteration, column = 1, columnspan = 2)
         self.sim_output_file_button = tk.Button(self, text="...", command = self.sim_output_filepath_dialog_button)

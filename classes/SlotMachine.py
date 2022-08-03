@@ -20,7 +20,11 @@ class SlotMachine():
         self.reels_sheetname = 'Reels'
         self.paytable_sheetname = 'Paytable'
         self.paylines_sheetname = 'Paylines'
+        # this section is to define where we get our theoretical/pre-calculated values from.. 
         self.rtp_sheetname = 'RTP'   # it doesn't like 'Ways/Pays' in excel
+        self.vi_sheetname = 'RTP'
+        self.rtp_column = 'RTP'
+        self.vi_column = 'VI'
         ## examples, uncomment to override the original sheet values
         # 3 reel low volatility
         #self.reels_sheetname = 'Reels_lowvol'
@@ -35,6 +39,7 @@ class SlotMachine():
         self.paytable_sheetname = 'Paytable5'
         self.paylines_sheetname = 'Paylines25'        
         self.rtp_sheetname = 'RTP5'   # it doesn't like 'Ways/Pays' in excel
+        self.vi_sheetname = 'RTP5'
         # ad hoc, a 5 reel with *M and *F 3/4/5x paytable lines added;
         #self.reels_sheetname = 'Reels5'
         #self.paytable_sheetname = 'Paytable5_withwilds'
@@ -48,6 +53,7 @@ class SlotMachine():
         self.paylines_total = 9 # 3x3 default value to be set later... in the paylines
         self.debug_level = debug_level
         # the math section.
+        self.wintoggle = 0
         self.hit_total = 0
         self.maximum_liability = 0
         self.volitility = float(0)
@@ -378,9 +384,10 @@ class SlotMachine():
 
         # set the RTP
         self.rtp_data = pd.read_excel(self.input_filepath, sheet_name=self.rtp_sheetname)
+        self.vi_data = pd.read_excel(self.input_filepath, sheet_name=self.vi_sheetname)
         # this is where the data is pulled from the columns on the rtp sheet
-        self.rtp = self.rtp_data['RTP'][0] * 100 ## times 100 so that we have the percentage that matches the data
-        self.vi = self.rtp_data['VI'][0]
+        self.rtp = self.rtp_data[self.rtp_column][0] * 100 ## times 100 so that we have the percentage that matches the data
+        self.vi = self.vi_data[self.vi_column][0]
 
         # Paytable Math begins here. 
         #total_combinations = 0
@@ -492,8 +499,8 @@ class SlotMachine():
                             print(f"    !!!!    Found nan    !!!!")
                         # meaning it encountered an empty cell, assume win
                         self.reset_wildsymbols()
-                        # this is where the hit_total is added, should go off for each win_combo found 
-                        self.hit_total += 1
+                        ### this is where the hit_total is added, should go off for each win_combo found 
+                        #self.hit_total += 1
                         if(self.debug_level >= 3):
                             print(f"    +=+=+=+= summation is currently {self.summation} and about to add {(self.mean_pay - (win_combo[len(win_combo)-1] ) ) ** 2}")
                         self.summation += (self.mean_pay - (win_combo[len(win_combo)-1] ) ) ** 2     ##* self.bet) ) ** 2
@@ -506,8 +513,9 @@ class SlotMachine():
                         self.adjust_credits( win_combo[len(win_combo)-1] * self.bet)  ### this should use credits, so bet value x the payline amount
 
                         if(self.debug_level >= 2):
-                            print(f"    +=+=+=+= summation is now {self.summation}, which added: ({self.mean_pay} minus {(win_combo[len(win_combo)-1])}) squared. Now at {self.hit_total} win 'hits' ")
+                            print(f"    +=+=+=+= summation is now {self.summation}, which added: ({self.mean_pay} minus {(win_combo[len(win_combo)-1])}) squared. ")
                         winbreak = 1
+                        self.wintoggle = 1
                         #return True
                         self.reset_wildsymbols()    
 
@@ -521,7 +529,7 @@ class SlotMachine():
                         if(reelnum + 1 == self.reels): # if it's the same all the way down, the whole line is a win
                             self.reset_wildsymbols()
                             # this is where the hit_total is added, should go off for each win_combo found 
-                            self.hit_total += 1
+                            #self.hit_total += 1
                             if(self.debug_level >= 3):
                                 print(f"    +=+=+=+= summation is currently {self.summation} and about to add {(self.mean_pay - (win_combo[len(win_combo)-1] ) ) ** 2}")
                             self.summation += (self.mean_pay - (win_combo[len(win_combo)-1] ) ) ** 2     ##* self.bet) ) ** 2
@@ -533,8 +541,9 @@ class SlotMachine():
                             self.adjust_credits( win_combo[len(win_combo)-1] * self.bet)  ### this should use credits, so bet value x the payline amount
 
                             if(self.debug_level >= 2):
-                                print(f"    +=+=+=+= summation is now {self.summation}, which added: ({self.mean_pay} minus {(win_combo[len(win_combo)-1])}) squared. Now at {self.hit_total} win 'hits' ")
+                                print(f"    +=+=+=+= summation is now {self.summation}, which added: ({self.mean_pay} minus {(win_combo[len(win_combo)-1])}) squared. ")
                             winbreak = 1
+                            self.wintoggle = 1
                             #return True
                             self.reset_wildsymbols()                            
                     else:
@@ -546,6 +555,11 @@ class SlotMachine():
                 if(winbreak == 1):
                     winbreak = 0
                     break
+        if(self.wintoggle == 1):
+            self.hit_total += 1
+            self.wintoggle = 0
+            if(self.debug_level >= 1):
+                print(f"    ^+^+ ^-^- +1 hit, now {self.hit_total}")
 
         # end of the payline checking, any totaling happens here. 
         if(self.debug_level >= 1):
