@@ -11,7 +11,7 @@ class Simulator():
         self.incremental_credits = []
         self.incremental_rtp = []
         self.spins = []
-        self.win_dict = ["credits"] # takes up the header line and lets us start at iteration 1 for data purposes
+        self.win_dict = ["credits won in pennies"] # takes up the header line and lets us start at iteration 1 for data purposes
         self.rtp_dict = ["RTP"] # takes up the header line and lets us start at iteration 1 for data purposes
         self.debug_level = debug_level
         self.total_bet = 0
@@ -45,9 +45,9 @@ class Simulator():
                 self.total_won += self.sm.this_win 
                 self.incremental_rtp.append( (self.total_won / self.total_bet) * 100 )
                 self.incremental_credits.append(self.sm.return_credits())
-                self.spins.append(iteration+1)
-                self.rtp_dict.insert(iteration+1, (self.total_won / self.total_bet))
-                self.win_dict.insert(iteration+1, self.sm.this_win)
+                self.spins.append(iteration + 1)
+                self.rtp_dict.insert(iteration + 1, (self.total_won / self.total_bet))
+                self.win_dict.insert(iteration + 1, int(round(self.sm.this_win * 100)))
 
                 if(self.debug_level >= 3):
                     print(f"    spin {str(iteration)} and credits ${str(self.sm.return_credits())} and added to the dictionary: {self.win_dict[iteration]}")

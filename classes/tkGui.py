@@ -1,3 +1,4 @@
+import os
 import math
 import matplotlib.pyplot as plt  # for displaying math 
 import tkinter as tk    # for the gui
@@ -93,7 +94,7 @@ class tkGui(tk.Tk):
             with open(str(self.sim_output_filepath.get()), 'w') as fp:
                 fp.close()
         data.to_csv(str(self.sim_output_filepath.get()))
-        if(self.debug_level.get() >= 1):
+        if(self.debug_level.get() >= 0):
             print(f"    Sim Output Saving... {str(self.sim_output_filepath.get())}")
 
     #currently unused
@@ -159,17 +160,20 @@ class tkGui(tk.Tk):
                 print(f"    ^^^^ the volatility math: {self.sm.summation} / {self.simruns.get() * (len(self.sm.paytable) + 1)} = {self.sm.summation/(self.simruns.get() * (len(self.sm.paytable) + 1))}.. sqrt is {math.sqrt( self.sm.summation / (self.simruns.get() * (len(self.sm.paytable) + 1) ))}, and so with * 1.96 the volatility index is {math.sqrt( self.sm.summation / (self.simruns.get() * (len(self.sm.paytable) + 1) )) * 1.96} ")
             volatilitymath = math.sqrt( self.sm.summation / (self.simruns.get() * (len(self.sm.paytable) + 1) ) ) * 1.96
             self.volatility.set(round(volatilitymath, 2))
-            self.found_volatility.set(round(self.sm.vi, 2))
+            #found volatility from the spreadsheet
+            self.found_volatility.set( round(self.sm.vi, 2) )
 
             # RTP
             if(self.debug_level.get() >= 1):
                 print(f"    $$$$ RTP is {self.sm.total_won} / {self.sm.total_bet} = {(self.sm.total_won / self.sm.total_bet)} ")
             self.return_to_player.set("{:.2f}".format(self.sm.total_won / self.sm.total_bet * 100)+"%")
-            self.found_return_to_player.set(round(self.sm.rtp, 2)) 
+            # found rtp from the spreadsheet
+            self.found_return_to_player.set( str(round(self.sm.rtp, 2) ) + "%" ) 
 
             # finally, record / print our final values as a status
-            if(self.debug_level.get() >= 0):
+            if(self.debug_level.get() >= 1):
                 print(f"Final values, at spin {self.sim.spins[len(self.sim.spins)-1]}, the final credit value was {self.sim.incremental_credits[len(self.sim.incremental_credits)-1]}" )
+
             # set the machine credits after each run
             self.machine_credits.set(self.sm.return_credits())
             print("Simulation Complete")

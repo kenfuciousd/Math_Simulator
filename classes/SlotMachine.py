@@ -35,11 +35,11 @@ class SlotMachine():
         #self.paytable_sheetname = 'Paytable_highvol'
         #self.paylines_sheetname = 'Paylines'      
         # 5 reels, Marissa's original setup 
-        self.reels_sheetname = 'Reels5'
-        self.paytable_sheetname = 'Paytable5'
-        self.paylines_sheetname = 'Paylines25'        
-        self.rtp_sheetname = 'RTP5'   # it doesn't like 'Ways/Pays' in excel
-        self.vi_sheetname = 'RTP5'
+        #self.reels_sheetname = 'Reels5'
+        #self.paytable_sheetname = 'Paytable5'
+        #self.paylines_sheetname = 'Paylines25'        
+        #self.rtp_sheetname = 'RTP5'   # it doesn't like 'Ways/Pays' in excel
+        #self.vi_sheetname = 'RTP5'
         # ad hoc, a 5 reel with *M and *F 3/4/5x paytable lines added;
         #self.reels_sheetname = 'Reels5'
         #self.paytable_sheetname = 'Paytable5_withwilds'
