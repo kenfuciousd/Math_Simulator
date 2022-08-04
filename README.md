@@ -9,13 +9,19 @@ To begin, run the main.py file through the python compiler.
 (command prompt: python main.py )
 There are no additional arguments to add. 
 
-Input guidelines for the Excel file are included in the .pdf, and in the example PARishSheet.xslx file.  The formatting is as follows:
-The excel file needs 4 sheets: 'Reels', 'Paytable', 'Paylines', 'RTP'
-Reels should have the Reel Strips, with no spaces, labeled "Reel #"
-Paytable should have the paytable sequence from largest to smallest, with the reel symbols listed and the pay line amount as the final column. 
-Paylines should be two numbers per cell: reel,position. Important: Counting starts at 0; so 0,0 is the uppermost left game widow position, 0,1 is the second position on the first reel; 2,2 is the third position on the third reel. 
-RTP sheet should have at least two columns, one labeled "Volatility" with the calculated volatility index, and "RTP" for the calculated Return To Player percentage. 
 
+
+Input guidelines for the Excel file are included in the .pdf, and in the example PARishSheet.xslx file.  The formatting is as follows:
+
+The excel file needs 4 sheets: 'Reels', 'Paytable', 'Paylines', 'RTP'
+
+'Reels' sheet should have the Reel Strips, with no spaces, labeled "Reel #"
+
+'Paytable' sheet should have the paytable sequence from largest to smallest, with the reel symbols listed and the pay line amount as the final column. note: for 5 reel, blanks are allowed in reel positions 4 or 5, to allow for smaller pay line wins. 
+
+'Paylines' should be two numbers per cell: reel,position. Important: Counting starts at 0; so 0,0 is the uppermost left game widow position, 0,1 is the second position on the first reel; 2,2 is the third position on the third reel. 
+
+'RTP' sheet should have at least two columns, one labeled "Volatility" with the calculated volatility index, and "RTP" for the calculated Return To Player percentage. 
 
 
 
