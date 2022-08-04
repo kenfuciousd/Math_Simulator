@@ -307,14 +307,14 @@ class tkGui(tk.Tk):
         #gui_row_iteration += 1
 
         # Plot Credits Button to show math
-        self.label_cred_plot = tk.Label(self, text="4b. Plot Credits Over Time")
+        self.label_cred_plot = tk.Label(self, text="4b. Plot Credits Over Spins")
         self.label_cred_plot.grid(row = gui_row_iteration, column = 0, columnspan=2, sticky=W, padx=15)
         gui_row_iteration += 1
         self.run_cred_plot_button = tk.Button(self, text="4b. Plot Credits", command = self.plot_cred_button_clicked)       
         self.run_cred_plot_button.grid(row = gui_row_iteration, column = 0, sticky=W, padx=15)
         gui_row_iteration += 1
         # Plot RTP Button to show math
-        self.label_rtp_plot = tk.Label(self, text="4c. Plot Return To Player over spins")
+        self.label_rtp_plot = tk.Label(self, text="4c. Plot Return To Player Over Spins")
         self.label_rtp_plot.grid(row = gui_row_iteration, column = 0, columnspan=2, sticky=W, padx=15)
         gui_row_iteration += 1
         self.run_rtp_plot_button = tk.Button(self, text="4c. Plot RTP", command = self.plot_rtp_button_clicked)       
